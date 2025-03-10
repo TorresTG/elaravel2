@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Libreria;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -24,15 +25,15 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
          // 1. Crear líneas de productos
-         $this->command->info('Creando líneas de productos...');
+     
          ProductLine::factory(5)->create();
          
          // 2. Crear oficinas
-         $this->command->info('Creando oficinas...');
+     
          Office::factory(5)->create();
          
          // 3. Crear empleados - Asegurarnos de que los employeeNumber son válidos
-         $this->command->info('Creando empleados...');
+  
          // Primero obtenemos todas las oficinas
          $offices = Office::all();
          
@@ -44,7 +45,7 @@ class DatabaseSeeder extends Seeder
          }
          
          // 4. Crear clientes - Asegurarnos de que los salesRepEmployeeNumber son válidos
-         $this->command->info('Creando clientes...');
+        
          // Primero obtenemos todos los empleados
          $employees = Employee::all();
          
@@ -62,7 +63,7 @@ class DatabaseSeeder extends Seeder
          }
          
          // 5. Crear productos
-         $this->command->info('Creando productos...');
+
          $productLines = ProductLine::all();
          
          foreach ($productLines as $productLine) {
@@ -72,7 +73,7 @@ class DatabaseSeeder extends Seeder
          }
          
          // 6. Crear órdenes
-         $this->command->info('Creando órdenes...');
+
          $customers = Customer::all();
          
          foreach ($customers as $customer) {
@@ -82,7 +83,7 @@ class DatabaseSeeder extends Seeder
          }
          
          // 7. Crear detalles de órdenes
-         $this->command->info('Creando detalles de órdenes...');
+
          $orders = Order::all();
          $products = Product::all();
          
@@ -104,7 +105,6 @@ class DatabaseSeeder extends Seeder
          }
          
          // 8. Crear pagos
-         $this->command->info('Creando pagos...');
          
          foreach ($customers as $customer) {
              // Cada cliente tendrá de 1 a 2 pagos
@@ -123,7 +123,9 @@ class DatabaseSeeder extends Seeder
         Role::create(['name' => 'Guest']);
         Role::create(['name' => 'User']);
         Role::create(['name' => 'Administrator']);
+        Libreria::factory(5)->create();
 
+        
         User::create([
             'name' => 'Admin',
             'email' => 'Tobi@example.com',

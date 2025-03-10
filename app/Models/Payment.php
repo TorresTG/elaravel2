@@ -19,6 +19,7 @@ class Payment extends Model
         'amount'
     ];
     
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customerNumber', 'customerNumber');
