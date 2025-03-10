@@ -71,7 +71,7 @@ class LibroController extends Controller
         return response()->json([
             'message' => 'Librería eliminado exitosamente',
         ], 204);
-    }
+    } 
     ///////////////////////////////////////////////////////////////////////////////
 
 }
