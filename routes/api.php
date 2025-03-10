@@ -174,4 +174,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/v1/pagos/{customerNumber}/{checkNumber}', [LibroController::class, 'destroyPayments'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
+    Route::get('/v1/tables', [LibroController::class, 'listTables']);
+
 });

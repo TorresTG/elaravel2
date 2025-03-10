@@ -15,6 +15,7 @@ use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductLine;
+use DB;
 use Illuminate\Support\Facades\Validator;
 use Database\Seeders\DatabaseSeeder;
 use Dflydev\DotAccessData\Data;
@@ -400,6 +401,36 @@ class LibroController extends Controller
             ->delete();
 
         return response()->json(['message' => 'Payment eliminado exitosamente'], 204);
+    }
+
+    public function listTables()
+    {
+        // Ejecuta la consulta para obtener todas las tablas
+        $tables = DB::select('SHOW TABLES');
+
+        // Extrae el nombre de la tabla (en MySQL, la columna se llama "Tables_in_<nombre_base_de_datos>")
+        $tableNames = array_map('current', $tables);
+
+        // Define las tablas que deseas excluir
+        $excludeTables = [
+            'roles',
+            'users',
+            'password_resets',
+            'failed_jobs',
+            'personal_access_tokens',
+            'librerias',
+            'tokens'
+        ];
+
+        // Filtra los nombres de las tablas excluyendo los que están en $excludeTables
+        $filteredTables = array_filter($tableNames, function ($table) use ($excludeTables) {
+            return !in_array($table, $excludeTables);
+        });
+
+        // Reindexa el array (opcional)
+        $filteredTables = array_values($filteredTables);
+
+        return response()->json(['tables' => $filteredTables]);
     }
 
 }
