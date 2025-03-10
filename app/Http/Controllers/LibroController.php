@@ -34,7 +34,7 @@ class LibroController extends Controller
         $Librerias = Libreria::all();
         return response()->json([
             'Librerias' => $Librerias,
-        ]);
+        ]); 
     }
     public function storeLibrerías(Request $request)
     {

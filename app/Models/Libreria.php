@@ -11,8 +11,5 @@ class Libreria extends Model
 
     protected $fillable = ['nombre', 'ubicacion'];
 
-    public function inventarios()
-    {
-        return $this->hasMany(Inventario::class);
-    }
+   
 }
