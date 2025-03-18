@@ -9,9 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Payment extends Model
 {
     use HasFactory;
-    protected $primaryKey = ['customerNumber', 'checkNumber'];
-    public $incrementing = false;
-    
+    protected $primaryKey = 'paymentNumber';
     protected $fillable = [
         'customerNumber',
         'checkNumber',

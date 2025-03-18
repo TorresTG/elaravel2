@@ -95,7 +95,7 @@ class DatabaseSeeder extends Seeder
              $orderProducts = $products->random($numProducts);
              
              foreach ($orderProducts as $product) {
-                 OrderDetail::create([
+                 OrderDetail::insert([
                      'orderNumber' => $order->orderNumber,
                      'productCode' => $product->productCode,
                      'quantityOrdered' => rand(1, 20),
@@ -111,7 +111,7 @@ class DatabaseSeeder extends Seeder
              $paymentCount = rand(1, 2);
              
              for ($i = 0; $i < $paymentCount; $i++) {
-                 Payment::create([
+                 Payment::insert([
                      'customerNumber' => $customer->customerNumber,
                      'checkNumber' => 'CK' . $customer->customerNumber . $i . rand(100, 999),
                      'paymentDate' => now()->subDays(rand(1, 180)),
