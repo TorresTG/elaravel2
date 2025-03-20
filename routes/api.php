@@ -160,20 +160,23 @@ Route::middleware(['auth:sanctum'])->group(function () {
 // Order Details
     Route::get('/v1/detalles-de-pedidos', [LibroController::class, 'indexOrderDetails']);
     Route::post('/v1/detalles-de-pedidos', [LibroController::class, 'storeOrderDetails'])->middleware('checkrole');
-    Route::get('/v1/detalles-de-pedidos/{orderNumber}/{productCode}', [LibroController::class, 'showOrderDetails']);
-    Route::put('/v1/detalles-de-pedidos/{orderNumber}/{productCode}', [LibroController::class, 'updateOrderDetails'])->middleware('checkrole');
-    Route::delete('/v1/detalles-de-pedidos/{orderNumber}/{productCode}', [LibroController::class, 'destroyOrderDetails'])->middleware('checkrole');
+    Route::get('/v1/detalles-de-pedidos/{orderDetailsNumber}', [LibroController::class, 'showOrderDetails']);
+    Route::put('/v1/detalles-de-pedidos/{orderDetailsNumber}', [LibroController::class, 'updateOrderDetails'])->middleware('checkrole');
+    Route::delete('/v1/detalles-de-pedidos/{orderDetailsNumber}', [LibroController::class, 'destroyOrderDetails'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
 // Payments
     Route::get('/v1/pagos', [LibroController::class, 'indexPayments']);
     Route::post('/v1/pagos', [LibroController::class, 'storePayments'])->middleware('checkrole');
-    Route::get('/v1/pagos/{customerNumber}/{checkNumber}', [LibroController::class, 'showPayments']);
-    Route::put('/v1/pagos/{customerNumber}/{checkNumber}', [LibroController::class, 'updatePayments'])->middleware('checkrole');
-    Route::delete('/v1/pagos/{customerNumber}/{checkNumber}', [LibroController::class, 'destroyPayments'])->middleware('checkrole');
+    Route::get('/v1/pagos/{paymentNumber}', [LibroController::class, 'showPayments']);
+    Route::put('/v1/pagos/{paymentNumber}', [LibroController::class, 'updatePayments'])->middleware('checkrole');
+    Route::delete('/v1/pagos/{paymentNumber}', [LibroController::class, 'destroyPayments'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
-    Route::get('/v1/tables', [LibroController::class, 'listTables']);
+
+    Route::get('/v1/tables', [LibroController::class, 'listTables'])->middleware('checkrole');
+    Route::get('/v1/model-fields/{model}', [LibroController::class, 'esquema_modelo'])->middleware('checkrole');
 
 });
+
