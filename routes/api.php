@@ -104,74 +104,74 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //////////////////////////////////////////////////////////////////////////////
 // Product Lines
-    Route::get('/v1/lineas-de-productos', [LibroController::class, 'indexProductLines']);
-    Route::post('/v1/lineas-de-productos', [LibroController::class, 'storeProductLines'])->middleware('checkrole');
-    Route::get('/v1/lineas-de-productos/{lineaDeProducto}', [LibroController::class, 'showProductLines']);
-    Route::put('/v1/lineas-de-productos/{lineaDeProducto}', [LibroController::class, 'updateProductLines'])->middleware('checkrole');
-    Route::delete('/v1/lineas-de-productos/{lineaDeProducto}', [LibroController::class, 'destroyProductLines'])->middleware('checkrole');
+    Route::get('/v1/product_lines', [LibroController::class, 'indexProductLines']);
+    Route::post('/v1/product_lines', [LibroController::class, 'storeProductLines'])->middleware('checkrole');
+    Route::get('/v1/product_lines/{lineaDeProducto}', [LibroController::class, 'showProductLines']);
+    Route::put('/v1/product_lines/{lineaDeProducto}', [LibroController::class, 'updateProductLines'])->middleware('checkrole');
+    Route::delete('/v1/product_lines/{lineaDeProducto}', [LibroController::class, 'destroyProductLines'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
 // Products
-    Route::get('/v1/productos', [LibroController::class, 'indexProducts']);
-    Route::post('/v1/productos', [LibroController::class, 'storeProducts'])->middleware('checkrole');
-    Route::get('/v1/productos/{producto}', [LibroController::class, 'showProducts']);
-    Route::put('/v1/productos/{producto}', [LibroController::class, 'updateProducts'])->middleware('checkrole');
-    Route::delete('/v1/productos/{producto}', [LibroController::class, 'destroyProducts'])->middleware('checkrole');
+    Route::get('/v1/products', [LibroController::class, 'indexProducts']);
+    Route::post('/v1/products', [LibroController::class, 'storeProducts'])->middleware('checkrole');
+    Route::get('/v1/products/{producto}', [LibroController::class, 'showProducts']);
+    Route::put('/v1/products/{producto}', [LibroController::class, 'updateProducts'])->middleware('checkrole');
+    Route::delete('/v1/products/{producto}', [LibroController::class, 'destroyProducts'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
 // Employees
-    Route::get('/v1/empleados', [LibroController::class, 'indexEmployees']);
-    Route::post('/v1/empleados', [LibroController::class, 'storeEmployees'])->middleware('checkrole');
-    Route::get('/v1/empleados/{empleado}', [LibroController::class, 'showEmployees']);
-    Route::put('/v1/empleados/{empleado}', [LibroController::class, 'updateEmployees'])->middleware('checkrole');
-    Route::delete('/v1/empleados/{empleado}', [LibroController::class, 'destroyEmployees'])->middleware('checkrole');
+    Route::get('/v1/employees', [LibroController::class, 'indexEmployees']);
+    Route::post('/v1/employees', [LibroController::class, 'storeEmployees'])->middleware('checkrole');
+    Route::get('/v1/employees/{empleado}', [LibroController::class, 'showEmployees']);
+    Route::put('/v1/employees/{empleado}', [LibroController::class, 'updateEmployees'])->middleware('checkrole');
+    Route::delete('/v1/employees/{empleado}', [LibroController::class, 'destroyEmployees'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
 // Offices
-    Route::get('/v1/oficinas', [LibroController::class, 'indexOffices']);
-    Route::post('/v1/oficinas', [LibroController::class, 'storeOffices'])->middleware('checkrole');
-    Route::get('/v1/oficinas/{oficina}', [LibroController::class, 'showOffices']);
-    Route::put('/v1/oficinas/{oficina}', [LibroController::class, 'updateOffices'])->middleware('checkrole');
-    Route::delete('/v1/oficinas/{oficina}', [LibroController::class, 'destroyOffices'])->middleware('checkrole');
+    Route::get('/v1/offices', [LibroController::class, 'indexOffices']);
+    Route::post('/v1/offices', [LibroController::class, 'storeOffices'])->middleware('checkrole');
+    Route::get('/v1/offices/{oficina}', [LibroController::class, 'showOffices']);
+    Route::put('/v1/offices/{oficina}', [LibroController::class, 'updateOffices'])->middleware('checkrole');
+    Route::delete('/v1/offices/{oficina}', [LibroController::class, 'destroyOffices'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
 // Customers
-    Route::get('/v1/clientes', [LibroController::class, 'indexCustomers']);
-    Route::post('/v1/clientes', [LibroController::class, 'storeCustomers'])->middleware('checkrole');
-    Route::get('/v1/clientes/{cliente}', [LibroController::class, 'showCustomers']);
-    Route::put('/v1/clientes/{cliente}', [LibroController::class, 'updateCustomers'])->middleware('checkrole');
-    Route::delete('/v1/clientes/{cliente}', [LibroController::class, 'destroyCustomers'])->middleware('checkrole');
+    Route::get('/v1/customers', [LibroController::class, 'indexCustomers']);
+    Route::post('/v1/customers', [LibroController::class, 'storeCustomers'])->middleware('checkrole');
+    Route::get('/v1/customers/{cliente}', [LibroController::class, 'showCustomers']);
+    Route::put('/v1/customers/{cliente}', [LibroController::class, 'updateCustomers'])->middleware('checkrole');
+    Route::delete('/v1/customers/{cliente}', [LibroController::class, 'destroyCustomers'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
 // Orders
-    Route::get('/v1/pedidos', [LibroController::class, 'indexOrders']);
-    Route::post('/v1/pedidos', [LibroController::class, 'storeOrders'])->middleware('checkrole');
-    Route::get('/v1/pedidos/{pedido}', [LibroController::class, 'showOrders']);
-    Route::put('/v1/pedidos/{pedido}', [LibroController::class, 'updateOrders'])->middleware('checkrole');
-    Route::delete('/v1/pedidos/{pedido}', [LibroController::class, 'destroyOrders'])->middleware('checkrole');
+    Route::get('/v1/orders', [LibroController::class, 'indexOrders']);
+    Route::post('/v1/orders', [LibroController::class, 'storeOrders'])->middleware('checkrole');
+    Route::get('/v1/orders/{pedido}', [LibroController::class, 'showOrders']);
+    Route::put('/v1/orders/{pedido}', [LibroController::class, 'updateOrders'])->middleware('checkrole');
+    Route::delete('/v1/orders/{pedido}', [LibroController::class, 'destroyOrders'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
 // Order Details
-    Route::get('/v1/detalles-de-pedidos', [LibroController::class, 'indexOrderDetails']);
-    Route::post('/v1/detalles-de-pedidos', [LibroController::class, 'storeOrderDetails'])->middleware('checkrole');
-    Route::get('/v1/detalles-de-pedidos/{orderDetailsNumber}', [LibroController::class, 'showOrderDetails']);
-    Route::put('/v1/detalles-de-pedidos/{orderDetailsNumber}', [LibroController::class, 'updateOrderDetails'])->middleware('checkrole');
-    Route::delete('/v1/detalles-de-pedidos/{orderDetailsNumber}', [LibroController::class, 'destroyOrderDetails'])->middleware('checkrole');
+    Route::get('/v1/order_details', [LibroController::class, 'indexOrderDetails']);
+    Route::post('/v1/order_details', [LibroController::class, 'storeOrderDetails'])->middleware('checkrole');
+    Route::get('/v1/order_details/{orderDetailsNumber}', [LibroController::class, 'showOrderDetails']);
+    Route::put('/v1/order_details/{orderDetailsNumber}', [LibroController::class, 'updateOrderDetails'])->middleware('checkrole');
+    Route::delete('/v1/order_details/{orderDetailsNumber}', [LibroController::class, 'destroyOrderDetails'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////
 // Payments
-    Route::get('/v1/pagos', [LibroController::class, 'indexPayments']);
-    Route::post('/v1/pagos', [LibroController::class, 'storePayments'])->middleware('checkrole');
-    Route::get('/v1/pagos/{paymentNumber}', [LibroController::class, 'showPayments']);
-    Route::put('/v1/pagos/{paymentNumber}', [LibroController::class, 'updatePayments'])->middleware('checkrole');
-    Route::delete('/v1/pagos/{paymentNumber}', [LibroController::class, 'destroyPayments'])->middleware('checkrole');
+    Route::get('/v1/payments', [LibroController::class, 'indexPayments']);
+    Route::post('/v1/payments', [LibroController::class, 'storePayments'])->middleware('checkrole');
+    Route::get('/v1/payments/{paymentNumber}', [LibroController::class, 'showPayments']);
+    Route::put('/v1/payments/{paymentNumber}', [LibroController::class, 'updatePayments'])->middleware('checkrole');
+    Route::delete('/v1/payments/{paymentNumber}', [LibroController::class, 'destroyPayments'])->middleware('checkrole');
     //////////////////////////////////////////////////////////////////////////////
 
 
