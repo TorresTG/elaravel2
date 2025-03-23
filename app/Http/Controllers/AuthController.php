@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ExpireActivationCode;
 use App\Mail\digitActivationMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    
+
     public function register_sanctum(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -34,12 +37,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'El usuario ya existe.'], 400);
         }
 
-        // Generar código único con máximo 10 intentos
         $maxAttempts = 10;
         $codemail = null;
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
-            $generatedCode = mt_rand(100000, 999999); // Solo códigos de 6 dígitos sin ceros a la izquierda
+            $generatedCode = mt_rand(100000, 999999);
 
             if (!User::where('codemail', $generatedCode)->exists()) {
                 $codemail = $generatedCode;
@@ -53,7 +55,7 @@ class AuthController extends Controller
             ], 500);
         }
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -65,10 +67,11 @@ class AuthController extends Controller
             'activation_token' => null
         ]);
 
-
-        //$activationLink = URL::temporarySignedRoute('user.activate', now()->addMinutes(5), ['user' => $user->id]);
-        //Mail::to($request->email)->send(new AccountActivationMail($activationLink));
-
+        // expirar código
+        /*
+        ExpireActivationCode::dispatch($user)
+            ->delay(now()->addMinutes(5));
+        */
         Mail::to($request->email)->send(new digitActivationMail($codemail));
 
         return response()->json([
@@ -77,7 +80,11 @@ class AuthController extends Controller
         ], 201);
     }
 
-    
+
+    //$activationLink = URL::temporarySignedRoute('user.activate', now()->addMinutes(5), ['user' => $user->id]);
+    //Mail::to($request->email)->send(new AccountActivationMail($activationLink));
+
+
     public function login_sanctum(Request $request)
     {
         $validator = Validator::make($request->all(), [
