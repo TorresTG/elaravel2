@@ -44,8 +44,6 @@ class DynamicEmail extends Mailable
                          'email' => $this->user->email, // Pasa el correo a la vista
                      ]);
      }
-     //C:\Users\Dante\elaravel2\storage\app\public\images
-     //C:\Users\Dante\elaravel2\storage\app/images/6qp0KpUp4z3fAImpv5i79QI8TW4NywB2yxRgR4Kw.jpg
     /**
      * Get the message envelope.
      *

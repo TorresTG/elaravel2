@@ -26,6 +26,7 @@ return new class extends Migration
             $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
             $table->boolean('is_active')->default(false);
             $table->boolean('is_inactive')->default(true);
+            $table->unsignedMediumInteger('codemail')->nullable()->unique();
             $table->string('profile_picture')->nullable(); 
             $table->string('activation_token')->nullable();
 

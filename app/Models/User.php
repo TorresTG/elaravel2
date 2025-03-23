@@ -24,6 +24,7 @@ class User extends Authenticatable
         'role_id',
         'is_active',
         'is_inactive',
+        'codemail',
         'profile_picture',
         'activation_token',
     ];
