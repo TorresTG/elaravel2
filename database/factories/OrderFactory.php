@@ -13,10 +13,9 @@ class OrderFactory extends Factory
     public function definition()
     {
         return [
-            'orderNumber' => $this->faker->unique()->numberBetween(10000, 99999),
             'orderDate' => $this->faker->dateTimeThisYear(),
             'status' => $this->faker->randomElement(['Pending', 'Processing', 'Shipped', 'Delivered']),
-            'customerNumber' => Customer::inRandomOrder()->first()->customerNumber
+            'customerNumber' => Customer::inRandomOrder()->first()->id
         ];
     }
 }

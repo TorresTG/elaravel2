@@ -13,9 +13,8 @@ class ProductFactory extends Factory
     public function definition()
     {
         return [
-            'productCode' => $this->faker->unique()->regexify('[A-Z]{3}[0-9]{3}'),
-            'productName' => $this->faker->words(3, true),
-            'productLine' => ProductLine::inRandomOrder()->first()->productLine,
+            'productName' => $this->faker->word(),
+            'productLine' => ProductLine::inRandomOrder()->first()->id,
             'quantityInStock' => $this->faker->numberBetween(0, 1000)
         ];
     }

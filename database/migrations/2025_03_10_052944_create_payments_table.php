@@ -9,12 +9,12 @@ return new class extends Migration
     public function up()
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->id('paymentNumber');
-            $table->integer('customerNumber');
-            $table->string('checkNumber');
+            $table->id();
+            $table->string('check');
             $table->date('paymentDate');
             $table->decimal('amount', 10, 2);
-            $table->foreign('customerNumber')->references('customerNumber')->on('customers');
+            $table->unsignedBigInteger('customerNumber');
+            $table->foreign('customerNumber')->references('id')->on('customers')->onDelete('cascade');;
             $table->timestamps();
         });
     }

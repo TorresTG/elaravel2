@@ -11,10 +11,8 @@ class Customer extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'customerNumber';
     
     protected $fillable = [
-        'customerNumber',
         'customerName',
         'phone',
         'salesRepEmployeeNumber'
@@ -22,16 +20,16 @@ class Customer extends Model
     
     public function salesRep(): BelongsTo
     {
-        return $this->belongsTo(Employee::class, 'salesRepEmployeeNumber', 'employeeNumber');
+        return $this->belongsTo(Employee::class);
     }
     
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class, 'customerNumber', 'customerNumber');
+        return $this->hasMany(Order::class);
     }
     
     public function payments(): HasMany
     {
-        return $this->hasMany(Payment::class, 'customerNumber', 'customerNumber');
+        return $this->hasMany(Payment::class);
     }
 }

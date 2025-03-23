@@ -13,8 +13,8 @@ class PaymentFactory extends Factory
     public function definition()
     {
         return [
-            'customerNumber' => Customer::inRandomOrder()->first()->customerNumber,
-            'checkNumber' => $this->faker->unique()->regexify('[A-Z]{2}[0-9]{6}'),
+            'customerNumber' => Customer::inRandomOrder()->first()->id,
+            'check' => $this->faker->unique()->regexify('[A-Z]{2}[0-9]{6}'),
             'paymentDate' => $this->faker->dateTimeThisYear(),
             'amount' => $this->faker->randomFloat(2, 100, 10000)
         ];

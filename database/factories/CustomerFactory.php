@@ -13,10 +13,9 @@ class CustomerFactory extends Factory
     public function definition()
     {
         return [
-            'customerNumber' => $this->faker->unique()->numberBetween(10000, 99999),
             'customerName' => $this->faker->company,
             'phone' => $this->faker->phoneNumber,
-            'salesRepEmployeeNumber' => Employee::inRandomOrder()->first()->employeeNumber
+            'salesRepEmployeeNumber' => Employee::inRandomOrder()->first()->id
         ];
     }
 }

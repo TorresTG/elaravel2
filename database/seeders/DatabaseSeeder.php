@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
          // Creamos empleados para cada oficina
          foreach ($offices as $office) {
              Employee::factory(rand(3, 5))->create([
-                 'officeCode' => $office->officeCode
+                 'officeCode' => $office->id
              ]);
          }
          
@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
          // Creamos clientes asignándoles empleados existentes
          foreach ($employees as $employee) {
              Customer::factory(rand(2, 5))->create([
-                 'salesRepEmployeeNumber' => $employee->employeeNumber
+                 'salesRepEmployeeNumber' => $employee->id
              ]);
          }
          
@@ -68,7 +68,7 @@ class DatabaseSeeder extends Seeder
          
          foreach ($productLines as $productLine) {
              Product::factory(rand(5, 10))->create([
-                 'productLine' => $productLine->productLine
+                 'productLine' => $productLine->id
              ]);
          }
          
@@ -78,7 +78,7 @@ class DatabaseSeeder extends Seeder
          
          foreach ($customers as $customer) {
              Order::factory(rand(1, 3))->create([
-                 'customerNumber' => $customer->customerNumber
+                 'customerNumber' => $customer->id
              ]);
          }
          
@@ -96,8 +96,8 @@ class DatabaseSeeder extends Seeder
              
              foreach ($orderProducts as $product) {
                  OrderDetail::insert([
-                     'orderNumber' => $order->orderNumber,
-                     'productCode' => $product->productCode,
+                     'orderNumber' => $order->id,
+                     'productCode' => $product->id,
                      'quantityOrdered' => rand(1, 20),
                      'priceEach' => rand(10, 500) + (rand(0, 99) / 100)
                  ]);
@@ -112,8 +112,8 @@ class DatabaseSeeder extends Seeder
              
              for ($i = 0; $i < $paymentCount; $i++) {
                  Payment::insert([
-                     'customerNumber' => $customer->customerNumber,
-                     'checkNumber' => 'CK' . $customer->customerNumber . $i . rand(100, 999),
+                     'customerNumber' => $customer->id,
+                     'check' => 'CK' . $customer->id . $i . rand(100, 999),
                      'paymentDate' => now()->subDays(rand(1, 180)),
                      'amount' => rand(100, 5000) + (rand(0, 99) / 100)
                  ]);

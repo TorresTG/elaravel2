@@ -10,7 +10,6 @@ class OrderDetail extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'orderDetailsNumber';
     
     protected $fillable = [
         'orderNumber',
@@ -21,11 +20,11 @@ class OrderDetail extends Model
     
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class, 'orderNumber', 'orderNumber');
+        return $this->belongsTo(Order::class);
     }
     
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'productCode', 'productCode');
+        return $this->belongsTo(Product::class);
     }
 }

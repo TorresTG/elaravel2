@@ -9,11 +9,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->integer('orderNumber')->primary();
+            $table->id();
             $table->date('orderDate');
             $table->string('status');
-            $table->integer('customerNumber');
-            $table->foreign('customerNumber')->references('customerNumber')->on('customers');
+            $table->unsignedBigInteger('customerNumber');
+            $table->foreign('customerNumber')->references('id')->on('customers')->onDelete('cascade');;
             $table->timestamps();
         });
     }

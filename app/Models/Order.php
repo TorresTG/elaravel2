@@ -10,10 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Order extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'orderNumber';
-    
     protected $fillable = [
-        'orderNumber',
         'orderDate',
         'status',
         'customerNumber'
@@ -21,11 +18,11 @@ class Order extends Model
     
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Customer::class, 'customerNumber', 'customerNumber');
+        return $this->belongsTo(Customer::class);
     }
     
     public function orderDetails(): HasMany
     {
-        return $this->hasMany(OrderDetail::class, 'orderNumber', 'orderNumber');
+        return $this->hasMany(OrderDetail::class);
     }
 }

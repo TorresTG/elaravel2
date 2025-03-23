@@ -13,10 +13,9 @@ class EmployeeFactory extends Factory
     public function definition()
     {
         return [
-            'employeeNumber' => $this->faker->unique()->numberBetween(1000, 9999),
             'lastName' => $this->faker->lastName,
             'firstName' => $this->faker->firstName,
-            'officeCode' => Office::inRandomOrder()->first()->officeCode
+            'officeCode' => Office::inRandomOrder()->first()->id
         ];
     }
 }

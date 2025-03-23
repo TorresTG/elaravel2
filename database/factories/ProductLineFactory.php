@@ -12,7 +12,6 @@ class ProductLineFactory extends Factory
     public function definition()
     {
         return [
-            'productLine' => $this->faker->unique()->word,
             'textDescription' => $this->faker->paragraph,
             'image' => $this->faker->imageUrl(640, 480)
         ];

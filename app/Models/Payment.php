@@ -9,10 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Payment extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'paymentNumber';
     protected $fillable = [
         'customerNumber',
-        'checkNumber',
+        'check',
         'paymentDate',
         'amount'
     ];
@@ -20,6 +19,6 @@ class Payment extends Model
 
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Customer::class, 'customerNumber', 'customerNumber');
+        return $this->belongsTo(Customer::class);
     }
 }

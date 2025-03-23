@@ -10,12 +10,8 @@ class Office extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'officeCode';
-    public $incrementing = false;
-    protected $keyType = 'string';
     
     protected $fillable = [
-        'officeCode',
         'city',
         'phone',
         'country'
@@ -23,6 +19,6 @@ class Office extends Model
     
     public function employees(): HasMany
     {
-        return $this->hasMany(Employee::class, 'officeCode', 'officeCode');
+        return $this->hasMany(Employee::class);
     }
 }

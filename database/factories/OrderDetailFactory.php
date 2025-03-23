@@ -14,8 +14,8 @@ class OrderDetailFactory extends Factory
     public function definition()
     {
         return [
-            'orderNumber' => Order::inRandomOrder()->first()->orderNumber,
-            'productCode' => Product::inRandomOrder()->first()->productCode,
+            'orderNumber' => Order::inRandomOrder()->first()->id,
+            'productCode' => Product::inRandomOrder()->first()->id,
             'quantityOrdered' => $this->faker->numberBetween(1, 100),
             'priceEach' => $this->faker->randomFloat(2, 10, 1000)
         ];

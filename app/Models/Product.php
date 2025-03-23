@@ -11,12 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Product extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'productCode';
-    public $incrementing = false;
-    protected $keyType = 'string';
-    
     protected $fillable = [
-        'productCode',
         'productName',
         'productLine',
         'quantityInStock'
@@ -24,11 +19,11 @@ class Product extends Model
     
     public function productLine(): BelongsTo
     {
-        return $this->belongsTo(ProductLine::class, 'productLine', 'productLine');
+        return $this->belongsTo(ProductLine::class,);
     }
     
     public function orderDetails(): HasMany
     {
-        return $this->hasMany(OrderDetail::class, 'productCode', 'productCode');
+        return $this->hasMany(OrderDetail::class);
     }
 }

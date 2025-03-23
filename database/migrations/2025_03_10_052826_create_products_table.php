@@ -9,11 +9,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->string('productCode')->primary();
+            $table->id();
             $table->string('productName');
-            $table->string('productLine');
             $table->integer('quantityInStock');
-            $table->foreign('productLine')->references('productLine')->on('product_lines');
+            $table->unsignedBigInteger('productLine');
+            $table->foreign('productLine')->references('id')->on('product_lines')->onDelete('cascade');;
             $table->timestamps();
         });
     }
