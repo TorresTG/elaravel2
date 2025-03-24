@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SSEController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LibroController;
@@ -39,6 +40,9 @@ Route::middleware(['auth:sanctum', 'checkadmin',])->group(function () {
     Route::get('/v1/gamesview/{id}', [juego::class, 'showGame'])
         ->where('id', '[0-9]+');
 });
+
+Route::get('v1/sse/{model}', [SSEController::class, 'stream'])->middleware('checkrole');
+
 Route::get('/digitActivate/{code}', [AuthController::class, 'digitActivateAcount'])->name('user.digitActivate');
 Route::get('/activate/{user}', [AuthController::class, 'activateAccount'])->name('user.activate')->middleware('signed');
 Route::post('/v1/renviar', [AuthController::class, 'resendActivationLink'])->name('activation-link')->middleware('checkinactive');
