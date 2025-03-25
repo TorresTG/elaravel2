@@ -41,7 +41,7 @@ Route::middleware(['auth:sanctum', 'checkadmin',])->group(function () {
         ->where('id', '[0-9]+');
 });
 
-Route::get('v1/sse/{model}', [SSEController::class, 'stream'])->middleware('checkrole');
+//->middleware('checkrole');
 
 Route::get('/digitActivate/{code}', [AuthController::class, 'digitActivateAcount'])->name('user.digitActivate');
 Route::get('/activate/{user}', [AuthController::class, 'activateAccount'])->name('user.activate')->middleware('signed');
@@ -184,3 +184,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 });
 
+
+Route::get('v1/sse/product_lines', [SSEController::class, 'stream']);
