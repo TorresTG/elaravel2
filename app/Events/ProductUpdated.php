@@ -16,28 +16,20 @@ class ProductUpdated implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $product;
 
-    public function __construct(Product $product)
+    public function __construct($product)
     {
         $this->product = $product;
     }
 
     public function broadcastOn()
     {
-        return new Channel('products'); // Canal público
+        return ['product']; // Canal público
     }
 
     // Opcional: Personalizar el nombre del evento
     public function broadcastAs()
     {
-        return 'product.updated';
+        return 'my-product';
     }
 
-    // Opcional: Personalizar datos enviados
-    public function broadcastWith()
-    {
-        return [
-            'product' => $this->product->toArray(),
-            'message' => 'Product updated!'
-        ];
-    }
 }

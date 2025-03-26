@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProductUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -130,6 +131,12 @@ class LibroController extends Controller
             'productLine' => $request->input('productLine'),
             'quantityInStock' => $request->input('quantityInStock')
         ]);
+        broadcast(new ProductUpdated([
+            'productCode' => $request->input('productCode'),
+            'productName' => $request->input('productName'),
+            'productLine' => $request->input('productLine'),
+            'quantityInStock' => $request->input('quantityInStock')
+        ]))->toOthers();
         return response()->json(['Product' => $product]);
     }
 
@@ -146,12 +153,17 @@ class LibroController extends Controller
             'productName' => $request->input('productName'),
             'quantityInStock' => $request->input('quantityInStock')
         ]);
+        broadcast(new ProductUpdated([
+            'productName' => $request->input('productName'),
+            'quantityInStock' => $request->input('quantityInStock')
+        ]))->toOthers();
         return response()->json(['Product' => $product]);
     }
 
     public function destroyProducts($id)
     {
         Product::destroy($id);
+        broadcast(new ProductUpdated(Product::all()))->toOthers();
         return response()->json(['message' => 'Product eliminado exitosamente'], 204);
     }
     ///////////////////////////////////////////////////////////////////////////////
