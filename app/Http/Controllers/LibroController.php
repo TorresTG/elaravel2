@@ -131,12 +131,7 @@ class LibroController extends Controller
             'productLine' => $request->input('productLine'),
             'quantityInStock' => $request->input('quantityInStock')
         ]);
-        broadcast(new ProductUpdated([
-            'productCode' => $request->input('productCode'),
-            'productName' => $request->input('productName'),
-            'productLine' => $request->input('productLine'),
-            'quantityInStock' => $request->input('quantityInStock')
-        ]))->toOthers();
+
         return response()->json(['Product' => $product]);
     }
 
@@ -146,6 +141,22 @@ class LibroController extends Controller
         return response()->json(['Product' => $product]);
     }
 
+    /*
+broadcast(new ProductUpdated([
+            'productCode' => $request->input('productCode'),
+            'productName' => $request->input('productName'),
+            'productLine' => $request->input('productLine'),
+            'quantityInStock' => $request->input('quantityInStock')
+        ]))->toOthers();
+
+    broadcast(new ProductUpdated([
+            'productName' => $request->input('productName'),
+            'quantityInStock' => $request->input('quantityInStock')
+        ]))->toOthers();
+
+        broadcast(new ProductUpdated(Product::all()))->toOthers();
+    */
+
     public function updateProducts(Request $request, $id)
     {
         $product = Product::find($id);
@@ -153,17 +164,13 @@ class LibroController extends Controller
             'productName' => $request->input('productName'),
             'quantityInStock' => $request->input('quantityInStock')
         ]);
-        broadcast(new ProductUpdated([
-            'productName' => $request->input('productName'),
-            'quantityInStock' => $request->input('quantityInStock')
-        ]))->toOthers();
         return response()->json(['Product' => $product]);
     }
 
     public function destroyProducts($id)
     {
         Product::destroy($id);
-        broadcast(new ProductUpdated(Product::all()))->toOthers();
+
         return response()->json(['message' => 'Product eliminado exitosamente'], 204);
     }
     ///////////////////////////////////////////////////////////////////////////////
@@ -438,41 +445,41 @@ class LibroController extends Controller
     }
 
     public function esquema_modelo($model)
-{
-    $model = 'App\\Models\\' . Str::studly(Str::singular($model));
+    {
+        $model = 'App\\Models\\' . Str::studly(Str::singular($model));
 
-    try {
-        $instance = new $model();
-        
-        // Obtener metadatos del modelo
-        $fillable = $instance->getFillable();
-        $primaryKey = $instance->getKeyName();
-        $foreignKeys = array_keys($instance->getRelations()); // Obtener nombres de relaciones
-        $timestamps = $instance->timestamps ? ['created_at', 'updated_at'] : [];
-        $softDeletes = method_exists($instance, 'getDeletedAtColumn') 
-                        ? [$instance->getDeletedAtColumn()] 
-                        : [];
+        try {
+            $instance = new $model();
 
-        // Combinar todos los campos a excluir
-        $excluded = array_merge(
-            [$primaryKey],
-            $foreignKeys,
-            $timestamps,
-            $softDeletes
-        );
+            // Obtener metadatos del modelo
+            $fillable = $instance->getFillable();
+            $primaryKey = $instance->getKeyName();
+            $foreignKeys = array_keys($instance->getRelations()); // Obtener nombres de relaciones
+            $timestamps = $instance->timestamps ? ['created_at', 'updated_at'] : [];
+            $softDeletes = method_exists($instance, 'getDeletedAtColumn')
+                ? [$instance->getDeletedAtColumn()]
+                : [];
 
-        // Filtrar campos fillable
-        $filteredFields = array_values(array_diff($fillable, $excluded));
+            // Combinar todos los campos a excluir
+            $excluded = array_merge(
+                [$primaryKey],
+                $foreignKeys,
+                $timestamps,
+                $softDeletes
+            );
 
-        return response()->json([
-            'fields' => $filteredFields,
-            'hidden' => $instance->getHidden(),
-            'casts' => $instance->getCasts()
-        ]);
-        
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Modelo no encontrado'], 404);
+            // Filtrar campos fillable
+            $filteredFields = array_values(array_diff($fillable, $excluded));
+
+            return response()->json([
+                'fields' => $filteredFields,
+                'hidden' => $instance->getHidden(),
+                'casts' => $instance->getCasts()
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Modelo no encontrado'], 404);
+        }
     }
-}
 
 }
