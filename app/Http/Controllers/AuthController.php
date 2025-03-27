@@ -54,6 +54,7 @@ class AuthController extends Controller
                 'message' => 'No se pudo generar un código único. Intenta registrar nuevamente.'
             ], 500);
         }
+     
 
         $user = User::create([
             'name' => $request->name,
@@ -67,13 +68,11 @@ class AuthController extends Controller
             'activation_token' => null
         ]);
 
-        // expirar código
-        /*
         ExpireActivationCode::dispatch($user)
             ->delay(now()->addMinutes(5));
-        */
-        Mail::to($request->email)->send(new digitActivationMail($codemail));
 
+        Mail::to($request->email)->send(new digitActivationMail($codemail));
+        
         return response()->json([
             'success' => true,
             'message' => 'Procesando usuario. Por favor, revisa tu correo para activar la cuenta.'
