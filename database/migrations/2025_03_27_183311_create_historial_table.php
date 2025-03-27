@@ -14,7 +14,7 @@ return new class extends Migration
     protected $connection = 'mongodb';
     public function up(): void
     {
-        Schema::connection('mongodb')->create('historial', function (Blueprint $table) {
+        Schema::create('historial', function (Blueprint $table) {
             $table->id(); // Genera un ObjectId automáticamente en MongoDB
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('url');
