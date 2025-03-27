@@ -116,32 +116,7 @@ class LibroController extends Controller
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-
-    public function indexProducts()
-    {
-        $products = Product::all();
-        return response()->json(['Products' => $products]);
-    }
-
-    public function storeProducts(Request $request)
-    {
-        $product = Product::create([
-            'productCode' => $request->input('productCode'),
-            'productName' => $request->input('productName'),
-            'productLine' => $request->input('productLine'),
-            'quantityInStock' => $request->input('quantityInStock')
-        ]);
-
-        return response()->json(['Product' => $product]);
-    }
-
-    public function showProducts($id)
-    {
-        $product = Product::findOrFail($id);
-        return response()->json(['Product' => $product]);
-    }
-
-    /*
+ /*
 broadcast(new ProductUpdated([
             'productCode' => $request->input('productCode'),
             'productName' => $request->input('productName'),
@@ -157,6 +132,36 @@ broadcast(new ProductUpdated([
         broadcast(new ProductUpdated(Product::all()))->toOthers();
     */
 
+
+
+    public function indexProducts()
+    {
+        $products = Product::all();
+        return response()->json(['Products' => $products]);
+    }
+
+    
+
+    public function showProducts($id)
+    {
+        $product = Product::findOrFail($id);
+        
+        return response()->json(['Product' => $product]);
+    }
+
+    public function storeProducts(Request $request)
+    {
+        $product = Product::create([
+            'productCode' => $request->input('productCode'),
+            'productName' => $request->input('productName'),
+            'productLine' => $request->input('productLine'),
+            'quantityInStock' => $request->input('quantityInStock')
+        ]);
+        event(new ProductUpdated("actualizar"));
+        return response()->json(['Product' => $product]);
+    }
+
+   
     public function updateProducts(Request $request, $id)
     {
         $product = Product::find($id);
@@ -164,13 +169,14 @@ broadcast(new ProductUpdated([
             'productName' => $request->input('productName'),
             'quantityInStock' => $request->input('quantityInStock')
         ]);
+        event(new ProductUpdated("actualizar"));
         return response()->json(['Product' => $product]);
     }
 
     public function destroyProducts($id)
     {
         Product::destroy($id);
-
+        event(new ProductUpdated("actualizar"));
         return response()->json(['message' => 'Product eliminado exitosamente'], 204);
     }
     ///////////////////////////////////////////////////////////////////////////////
