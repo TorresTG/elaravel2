@@ -27,7 +27,7 @@ Route::get('/hello', function () {
     return 'hello';
 });
 
-Route::middleware(['log.historial'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     // rutas que solo puedes acceder si eres admin }
     Route::middleware(['auth:sanctum', 'checkadmin', 'log.historial'])->group(function () {
         Route::get('/v1/isAdmin', [AdminController::class, 'isAdmin']);
@@ -94,7 +94,7 @@ Route::middleware(['auth:sanctum','checkrole', 'checkactive', 'checkinactive'])-
 });
 */
     //Tablas
-    Route::middleware(['auth:sanctum', 'log.historial'])->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
         //////////////////////////////////////////////////////////////////////////////
         // Mostrar todos lal librerías
         Route::get('/v1/librerías', [LibroController::class, 'indexLibrerías']);
