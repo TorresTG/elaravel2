@@ -24,108 +24,108 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-         // 1. Crear líneas de productos
-     
-         ProductLine::factory(5)->create();
-         
-         // 2. Crear oficinas
-     
-         Office::factory(5)->create();
-         
-         // 3. Crear empleados - Asegurarnos de que los employeeNumber son válidos
-  
-         // Primero obtenemos todas las oficinas
-         $offices = Office::all();
-         
-         // Creamos empleados para cada oficina
-         foreach ($offices as $office) {
-             Employee::factory(rand(3, 5))->create([
-                 'officeCode' => $office->id
-             ]);
-         }
-         
-         // 4. Crear clientes - Asegurarnos de que los salesRepEmployeeNumber son válidos
-        
-         // Primero obtenemos todos los empleados
-         $employees = Employee::all();
-         
-         // Verificamos que tengamos empleados
-         if ($employees->isEmpty()) {
-             $this->command->error('No hay empleados disponibles para asignar a clientes.');
-             return;
-         }
-         
-         // Creamos clientes asignándoles empleados existentes
-         foreach ($employees as $employee) {
-             Customer::factory(rand(2, 5))->create([
-                 'salesRepEmployeeNumber' => $employee->id
-             ]);
-         }
-         
-         // 5. Crear productos
+        // 1. Crear líneas de productos
 
-         $productLines = ProductLine::all();
-         
-         foreach ($productLines as $productLine) {
-             Product::factory(rand(5, 10))->create([
-                 'productLine' => $productLine->id
-             ]);
-         }
-         
-         // 6. Crear órdenes
+        ProductLine::factory(5)->create();
 
-         $customers = Customer::all();
-         
-         foreach ($customers as $customer) {
-             Order::factory(rand(1, 3))->create([
-                 'customerNumber' => $customer->id
-             ]);
-         }
-         
-         // 7. Crear detalles de órdenes
+        // 2. Crear oficinas
 
-         $orders = Order::all();
-         $products = Product::all();
-         
-         foreach ($orders as $order) {
-             // Determinar cuántos productos incluir en esta orden (1-3)
-             $numProducts = min(rand(1, 3), $products->count());
-             
-             // Seleccionar productos aleatorios para esta orden
-             $orderProducts = $products->random($numProducts);
-             
-             foreach ($orderProducts as $product) {
-                 OrderDetail::insert([
-                     'orderNumber' => $order->id,
-                     'productCode' => $product->id,
-                     'quantityOrdered' => rand(1, 20),
-                     'priceEach' => rand(10, 500) + (rand(0, 99) / 100)
-                 ]);
-             }
-         }
-         
-         // 8. Crear pagos
-         
-         foreach ($customers as $customer) {
-             // Cada cliente tendrá de 1 a 2 pagos
-             $paymentCount = rand(1, 2);
-             
-             for ($i = 0; $i < $paymentCount; $i++) {
-                 Payment::insert([
-                     'customerNumber' => $customer->id,
-                     'check' => 'CK' . $customer->id . $i . rand(100, 999),
-                     'paymentDate' => now()->subDays(rand(1, 180)),
-                     'amount' => rand(100, 5000) + (rand(0, 99) / 100)
-                 ]);
-             }
-         }
-         
+        Office::factory(5)->create();
+
+        // 3. Crear empleados - Asegurarnos de que los employeeNumber son válidos
+
+        // Primero obtenemos todas las oficinas
+        $offices = Office::all();
+
+        // Creamos empleados para cada oficina
+        foreach ($offices as $office) {
+            Employee::factory(rand(3, 5))->create([
+                'officeCode' => $office->id
+            ]);
+        }
+
+        // 4. Crear clientes - Asegurarnos de que los salesRepEmployeeNumber son válidos
+
+        // Primero obtenemos todos los empleados
+        $employees = Employee::all();
+
+        // Verificamos que tengamos empleados
+        if ($employees->isEmpty()) {
+            $this->command->error('No hay empleados disponibles para asignar a clientes.');
+            return;
+        }
+
+        // Creamos clientes asignándoles empleados existentes
+        foreach ($employees as $employee) {
+            Customer::factory(rand(2, 5))->create([
+                'salesRepEmployeeNumber' => $employee->id
+            ]);
+        }
+
+        // 5. Crear productos
+
+        $productLines = ProductLine::all();
+
+        foreach ($productLines as $productLine) {
+            Product::factory(rand(5, 10))->create([
+                'productLine' => $productLine->id
+            ]);
+        }
+
+        // 6. Crear órdenes
+
+        $customers = Customer::all();
+
+        foreach ($customers as $customer) {
+            Order::factory(rand(1, 3))->create([
+                'customerNumber' => $customer->id
+            ]);
+        }
+
+        // 7. Crear detalles de órdenes
+
+        $orders = Order::all();
+        $products = Product::all();
+
+        foreach ($orders as $order) {
+            // Determinar cuántos productos incluir en esta orden (1-3)
+            $numProducts = min(rand(1, 3), $products->count());
+
+            // Seleccionar productos aleatorios para esta orden
+            $orderProducts = $products->random($numProducts);
+
+            foreach ($orderProducts as $product) {
+                OrderDetail::insert([
+                    'orderNumber' => $order->id,
+                    'productCode' => $product->id,
+                    'quantityOrdered' => rand(1, 20),
+                    'priceEach' => rand(10, 500) + (rand(0, 99) / 100)
+                ]);
+            }
+        }
+
+        // 8. Crear pagos
+
+        foreach ($customers as $customer) {
+            // Cada cliente tendrá de 1 a 2 pagos
+            $paymentCount = rand(1, 2);
+
+            for ($i = 0; $i < $paymentCount; $i++) {
+                Payment::insert([
+                    'customerNumber' => $customer->id,
+                    'check' => 'CK' . $customer->id . $i . rand(100, 999),
+                    'paymentDate' => now()->subDays(rand(1, 180)),
+                    'amount' => rand(100, 5000) + (rand(0, 99) / 100)
+                ]);
+            }
+        }
+
         Role::create(['name' => 'Guest']);
         Role::create(['name' => 'User']);
         Role::create(['name' => 'Administrator']);
         Libreria::factory(5)->create();
 
-        
+
         User::create([
             'name' => 'Admin',
             'email' => 'Tobi@gmail.com',
@@ -133,5 +133,40 @@ class DatabaseSeeder extends Seeder
             'role_id' => 3,
             'is_active' => true,
         ]);
+        User::create([
+            'name' => 'toto',
+            'email' => 'toto@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role_id' => 2,
+            'is_active' => true,
+        ]);
+        User::create([
+            'name' => 'juan',
+            'email' => 'juan@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role_id' => 2,
+            'is_active' => true,
+        ]);
+        User::create([
+            'name' => 'pepe',
+            'email' => 'pepe@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role_id' => 1,
+            'is_active' => true,
+        ]);
+        User::create([
+            'name' => 'koko',
+            'email' => 'koko@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role_id' => 1,
+            'is_active' => true,
+        ]);
+        User::create([
+            'name' => 'lolo',
+            'email' => 'lolo@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role_id' => 1,
+            'is_active' => true,
+        ]);
     }
-} 
+}

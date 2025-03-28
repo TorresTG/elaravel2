@@ -85,13 +85,27 @@ class LibroController extends Controller
 
     public function storeProductLines(Request $request)
     {
-        $productLine = ProductLine::create([
-            'productLine' => $request->input('productLine'),
-            'textDescription' => $request->input('textDescription'),
-            'image' => $request->input('image')
+        $validator = Validator::make($request->all(), [
+            'productLine' => 'required|string|max:50|unique:product_lines,productLine',
+            'textDescription' => 'nullable|string|max:400',
+            'image' => 'nullable|string|max:255'
+        ], [
+            'productLine.required' => 'Debe especificar un nombre para la línea de productos',
+            'productLine.unique' => 'Esta línea de productos ya está registrada',
+            'productLine.max' => 'El nombre no puede superar los 50 caracteres',
+            'textDescription.max' => 'La descripción no puede exceder los 400 caracteres',
+            'image.max' => 'La ruta de la imagen es demasiado larga'
         ]);
-        return response()->json(['ProductLine' => $productLine]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $productLine = ProductLine::create($request->all());
+        return response()->json(['ProductLine' => $productLine], 201);
     }
+
+
 
     public function showProductLines($id)
     {
@@ -100,14 +114,26 @@ class LibroController extends Controller
     }
 
     public function updateProductLines(Request $request, $id)
-    {
-        $productLine = ProductLine::find($id);
-        $productLine->update([
-            'textDescription' => $request->input('textDescription'),
-            'image' => $request->input('image')
-        ]);
-        return response()->json(['ProductLine' => $productLine]);
+{
+    $validator = Validator::make($request->all(), [
+        'productLine' => 'string|max:50|unique:product_lines,productLine,' . $id,
+        'textDescription' => 'nullable|string|max:400',
+        'image' => 'nullable|string|max:255'
+    ], [
+        'productLine.unique' => 'Este nombre de línea ya está en uso',
+        'productLine.max' => 'El nombre debe tener máximo 50 caracteres',
+        'textDescription.max' => 'La descripción supera el límite de 400 caracteres',
+        'image.max' => 'La ruta de la imagen es inválida'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
     }
+
+    $productLine = ProductLine::findOrFail($id);
+    $productLine->update($request->all());
+    return response()->json(['ProductLine' => $productLine]);
+}
 
     public function destroyProductLines($id)
     {
@@ -116,21 +142,21 @@ class LibroController extends Controller
     }
 
     ///////////////////////////////////////////////////////////////////////////////
- /*
-broadcast(new ProductUpdated([
-            'productCode' => $request->input('productCode'),
-            'productName' => $request->input('productName'),
-            'productLine' => $request->input('productLine'),
-            'quantityInStock' => $request->input('quantityInStock')
-        ]))->toOthers();
+    /*
+   broadcast(new ProductUpdated([
+               'productCode' => $request->input('productCode'),
+               'productName' => $request->input('productName'),
+               'productLine' => $request->input('productLine'),
+               'quantityInStock' => $request->input('quantityInStock')
+           ]))->toOthers();
 
-    broadcast(new ProductUpdated([
-            'productName' => $request->input('productName'),
-            'quantityInStock' => $request->input('quantityInStock')
-        ]))->toOthers();
+       broadcast(new ProductUpdated([
+               'productName' => $request->input('productName'),
+               'quantityInStock' => $request->input('quantityInStock')
+           ]))->toOthers();
 
-        broadcast(new ProductUpdated(Product::all()))->toOthers();
-    */
+           broadcast(new ProductUpdated(Product::all()))->toOthers();
+       */
 
 
 
@@ -140,35 +166,64 @@ broadcast(new ProductUpdated([
         return response()->json(['Products' => $products]);
     }
 
-    
+
 
     public function showProducts($id)
     {
         $product = Product::findOrFail($id);
-        
+
         return response()->json(['Product' => $product]);
     }
 
     public function storeProducts(Request $request)
     {
-        $product = Product::create([
-            'productCode' => $request->input('productCode'),
-            'productName' => $request->input('productName'),
-            'productLine' => $request->input('productLine'),
-            'quantityInStock' => $request->input('quantityInStock')
+        $validator = Validator::make($request->all(), [
+            'productCode' => 'required|string|max:15|unique:products,productCode',
+            'productName' => 'required|string|max:70',
+            'productLine' => 'required|exists:product_lines,id',
+            'quantityInStock' => 'required|integer|min:0|max:100000'
+        ], [
+            'productCode.required' => 'El código del producto es obligatorio',
+            'productCode.unique' => 'Este código de producto ya existe',
+            'productCode.max' => 'El código no puede tener más de 15 caracteres',
+            'productName.required' => 'El nombre del producto es requerido',
+            'productName.max' => 'El nombre excede los 70 caracteres permitidos',
+            'productLine.exists' => 'La categoría seleccionada no existe',
+            'quantityInStock.min' => 'El stock no puede ser negativo',
+            'quantityInStock.max' => 'El stock no puede superar 100,000 unidades'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $product = Product::create($request->all());
         event(new ProductUpdated("actualizar"));
-        return response()->json(['Product' => $product]);
+        return response()->json(['Product' => $product], 201);
     }
 
-   
     public function updateProducts(Request $request, $id)
     {
-        $product = Product::find($id);
-        $product->update([
-            'productName' => $request->input('productName'),
-            'quantityInStock' => $request->input('quantityInStock')
+        $validator = Validator::make($request->all(), [
+            'productCode' => 'string|max:15|unique:products,productCode,' . $id,
+            'productName' => 'string|max:70',
+            'productLine' => 'exists:product_lines,id',
+            'quantityInStock' => 'integer|min:0|max:100000'
+        ], [
+            'productCode.unique' => 'Este código ya está asignado a otro producto',
+            'productCode.max' => 'El código debe tener máximo 15 caracteres',
+            'productName.max' => 'El nombre no puede exceder 70 caracteres',
+            'productLine.exists' => 'Seleccione una categoría válida',
+            'quantityInStock.min' => 'El stock mínimo permitido es 0',
+            'quantityInStock.max' => 'Límite de stock excedido (100,000 unidades)'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $product = Product::findOrFail($id);
+        $product->update($request->all());
         event(new ProductUpdated("actualizar"));
         return response()->json(['Product' => $product]);
     }
@@ -188,13 +243,25 @@ broadcast(new ProductUpdated([
 
     public function storeEmployees(Request $request)
     {
-        $employee = Employee::create([
-            'employeeNumber' => $request->input('employeeNumber'),
-            'lastName' => $request->input('lastName'),
-            'firstName' => $request->input('firstName'),
-            'officeCode' => $request->input('officeCode')
+        $validator = Validator::make($request->all(), [
+            'lastName' => 'required|string|max:50',
+            'firstName' => 'required|string|max:50',
+            'officeCode' => 'required|exists:offices,id'
+        ], [
+            'lastName.required' => 'El apellido es obligatorio',
+            'lastName.max' => 'El apellido no puede superar 50 caracteres',
+            'firstName.required' => 'El nombre es obligatorio',
+            'firstName.max' => 'El nombre no puede exceder 50 caracteres',
+            'officeCode.exists' => 'La oficina seleccionada no existe'
         ]);
-        return response()->json(['Employee' => $employee]);
+    
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $employee = Employee::create($request->all());
+        return response()->json(['Employee' => $employee], 201);
     }
 
     public function showEmployees($id)
@@ -205,11 +272,22 @@ broadcast(new ProductUpdated([
 
     public function updateEmployees(Request $request, $id)
     {
-        $employee = Employee::find($id);
-        $employee->update([
-            'lastName' => $request->input('lastName'),
-            'firstName' => $request->input('firstName')
+        $validator = Validator::make($request->all(), [
+            'lastName' => 'string|max:50',
+            'firstName' => 'string|max:50',
+            'officeCode' => 'exists:offices,id'
+        ], [
+            'lastName.max' => 'El apellido debe tener máximo 50 caracteres',
+            'firstName.max' => 'El nombre debe tener máximo 50 caracteres',
+            'officeCode.exists' => 'Seleccione una oficina válida'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $employee = Employee::findOrFail($id);
+        $employee->update($request->all());
         return response()->json(['Employee' => $employee]);
     }
 
@@ -227,14 +305,28 @@ broadcast(new ProductUpdated([
 
     public function storeOffices(Request $request)
     {
-        $office = Office::create([
-            'officeCode' => $request->input('officeCode'),
-            'city' => $request->input('city'),
-            'phone' => $request->input('phone'),
-            'country' => $request->input('country')
+        $validator = Validator::make($request->all(), [
+            'city' => 'required|string|max:50',
+            'phone' => 'required|string|max:15|unique:offices,phone',
+            'country' => 'required|string|max:50'
+        ], [
+            'city.required' => 'La ciudad es obligatoria',
+            'city.max' => 'El nombre de la ciudad es demasiado largo',
+            'phone.required' => 'El teléfono es obligatorio',
+            'phone.unique' => 'Este número de teléfono ya está registrado',
+            'phone.max' => 'El teléfono no puede exceder 15 dígitos',
+            'country.required' => 'El país es obligatorio',
+            'country.max' => 'El nombre del país es demasiado largo'
         ]);
-        return response()->json(['Office' => $office]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $office = Office::create($request->all());
+        return response()->json(['Office' => $office], 201);
     }
+
 
     public function showOffices($id)
     {
@@ -244,12 +336,23 @@ broadcast(new ProductUpdated([
 
     public function updateOffices(Request $request, $id)
     {
-        $office = Office::find($id);
-        $office->update([
-            'city' => $request->input('city'),
-            'phone' => $request->input('phone'),
-            'country' => $request->input('country')
+        $validator = Validator::make($request->all(), [
+            'city' => 'string|max:50',
+            'phone' => 'string|max:15|unique:offices,phone,' . $id,
+            'country' => 'string|max:50'
+        ], [
+            'city.max' => 'La ciudad no puede superar 50 caracteres',
+            'phone.unique' => 'Este teléfono ya está en uso por otra oficina',
+            'phone.max' => 'El teléfono debe tener máximo 15 dígitos',
+            'country.max' => 'El país no puede exceder 50 caracteres'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $office = Office::findOrFail($id);
+        $office->update($request->all());
         return response()->json(['Office' => $office]);
     }
 
@@ -267,13 +370,25 @@ broadcast(new ProductUpdated([
 
     public function storeCustomers(Request $request)
     {
-        $customer = Customer::create([
-            'customerNumber' => $request->input('customerNumber'),
-            'customerName' => $request->input('customerName'),
-            'phone' => $request->input('phone'),
-            'salesRepEmployeeNumber' => $request->input('salesRepEmployeeNumber')
+        $validator = Validator::make($request->all(), [
+            'customerName' => 'required|string|max:50',
+            'phone' => 'required|string|max:15|unique:customers,phone',
+            'salesRepEmployeeNumber' => 'required|exists:employees,id'
+        ], [
+            'customerName.required' => 'El nombre del cliente es obligatorio',
+            'customerName.max' => 'El nombre no puede superar 50 caracteres',
+            'phone.required' => 'El teléfono es obligatorio',
+            'phone.unique' => 'Este teléfono ya está registrado',
+            'phone.max' => 'El teléfono debe tener máximo 15 dígitos',
+            'salesRepEmployeeNumber.exists' => 'El empleado asignado no existe'
         ]);
-        return response()->json(['Customer' => $customer]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $customer = Customer::create($request->all());
+        return response()->json(['Customer' => $customer], 201);
     }
 
     public function showCustomers($id)
@@ -284,11 +399,23 @@ broadcast(new ProductUpdated([
 
     public function updateCustomers(Request $request, $id)
     {
-        $customer = Customer::find($id);
-        $customer->update([
-            'customerName' => $request->input('customerName'),
-            'phone' => $request->input('phone')
+        $validator = Validator::make($request->all(), [
+            'customerName' => 'string|max:50',
+            'phone' => 'string|max:15|unique:customers,phone,' . $id,
+            'salesRepEmployeeNumber' => 'exists:employees,id'
+        ], [
+            'customerName.max' => 'El nombre no puede exceder 50 caracteres',
+            'phone.unique' => 'Este teléfono ya está en uso por otro cliente',
+            'phone.max' => 'El teléfono debe tener máximo 15 dígitos',
+            'salesRepEmployeeNumber.exists' => 'Seleccione un empleado válido'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $customer = Customer::findOrFail($id);
+        $customer->update($request->all());
         return response()->json(['Customer' => $customer]);
     }
 
@@ -306,13 +433,24 @@ broadcast(new ProductUpdated([
 
     public function storeOrders(Request $request)
     {
-        $order = Order::create([
-            'orderNumber' => $request->input('orderNumber'),
-            'orderDate' => $request->input('orderDate'),
-            'status' => $request->input('status'),
-            'customerNumber' => $request->input('customerNumber')
+        $validator = Validator::make($request->all(), [
+            'orderDate' => 'required|date',
+            'status' => 'required|string|in:pendiente,completado,cancelado',
+            'customerNumber' => 'required|exists:customers,id'
+        ], [
+            'orderDate.required' => 'La fecha del pedido es obligatoria',
+            'orderDate.date' => 'Formato de fecha inválido',
+            'status.required' => 'El estado del pedido es obligatorio',
+            'status.in' => 'Estado no válido. Opciones: pendiente, completado, cancelado',
+            'customerNumber.exists' => 'El cliente seleccionado no existe'
         ]);
-        return response()->json(['Order' => $order]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $order = Order::create($request->all());
+        return response()->json(['Order' => $order], 201);
     }
 
     public function showOrders($id)
@@ -323,11 +461,22 @@ broadcast(new ProductUpdated([
 
     public function updateOrders(Request $request, $id)
     {
-        $order = Order::find($id);
-        $order->update([
-            'orderDate' => $request->input('orderDate'),
-            'status' => $request->input('status')
+        $validator = Validator::make($request->all(), [
+            'orderDate' => 'date',
+            'status' => 'string|in:pendiente,completado,cancelado',
+            'customerNumber' => 'exists:customers,id'
+        ], [
+            'orderDate.date' => 'Formato de fecha incorrecto',
+            'status.in' => 'Estado no permitido. Use: pendiente, completado o cancelado',
+            'customerNumber.exists' => 'El cliente no existe en la base de datos'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $order = Order::findOrFail($id);
+        $order->update($request->all());
         return response()->json(['Order' => $order]);
     }
 
@@ -345,13 +494,26 @@ broadcast(new ProductUpdated([
 
     public function storeOrderDetails(Request $request)
     {
-        $orderDetail = OrderDetail::create([
-            'orderNumber' => $request->input('orderNumber'),
-            'productCode' => $request->input('productCode'),
-            'quantityOrdered' => $request->input('quantityOrdered'),
-            'priceEach' => $request->input('priceEach')
+        $validator = Validator::make($request->all(), [
+            'orderNumber' => 'required|exists:orders,id',
+            'productCode' => 'required|exists:products,id',
+            'quantityOrdered' => 'required|integer|min:1|max:1000',
+            'priceEach' => 'required|numeric|min:0.01|max:999999.99'
+        ], [
+            'orderNumber.exists' => 'El pedido seleccionado no existe',
+            'productCode.exists' => 'El producto seleccionado no existe',
+            'quantityOrdered.min' => 'La cantidad mínima es 1 unidad',
+            'quantityOrdered.max' => 'La cantidad máxima permitida es 1000 unidades',
+            'priceEach.min' => 'El precio unitario debe ser mayor a $0.01',
+            'priceEach.max' => 'El precio unitario no puede superar $999,999.99'
         ]);
-        return response()->json(['OrderDetail' => $orderDetail]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $orderDetail = OrderDetail::create($request->all());
+        return response()->json(['OrderDetail' => $orderDetail], 201);
     }
 
     public function showOrderDetails($id)
@@ -362,12 +524,23 @@ broadcast(new ProductUpdated([
 
     public function updateOrderDetails(Request $request, $id)
     {
-        OrderDetail::find($id)->update([
-            'quantityOrdered' => $request->input('quantityOrdered'),
-            'priceEach' => $request->input('priceEach')
+        $validator = Validator::make($request->all(), [
+            'quantityOrdered' => 'integer|min:1|max:1000',
+            'priceEach' => 'numeric|min:0.01|max:999999.99'
+        ], [
+            'quantityOrdered.min' => 'Debe ordenar al menos 1 unidad',
+            'quantityOrdered.max' => 'No puede ordenar más de 1000 unidades',
+            'priceEach.min' => 'El precio no puede ser menor a $0.01',
+            'priceEach.max' => 'El precio excede el máximo permitido ($999,999.99)'
         ]);
 
-        return response()->json(['message' => 'OrderDetail actualizado exitosamente']);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $orderDetail = OrderDetail::findOrFail($id);
+        $orderDetail->update($request->all());
+        return response()->json(['OrderDetail' => $orderDetail]);
     }
 
     public function destroyOrderDetails($id)
@@ -385,13 +558,29 @@ broadcast(new ProductUpdated([
 
     public function storePayments(Request $request)
     {
-        $payment = Payment::create([
-            'customerNumber' => $request->input('customerNumber'),
-            'checkNumber' => $request->input('checkNumber'),
-            'paymentDate' => $request->input('paymentDate'),
-            'amount' => $request->input('amount')
+        $validator = Validator::make($request->all(), [
+            'checkNumber' => 'required|string|max:50|unique:payments,checkNumber',
+            'paymentDate' => 'required|date',
+            'amount' => 'required|numeric|min:0.01|max:1000000',
+            'customerNumber' => 'required|exists:customers,id'
+        ], [
+            'checkNumber.required' => 'El número de cheque es obligatorio',
+            'checkNumber.unique' => 'Este número de cheque ya fue registrado',
+            'checkNumber.max' => 'El número de cheque no puede superar 50 caracteres',
+            'paymentDate.required' => 'La fecha de pago es obligatoria',
+            'paymentDate.date' => 'Formato de fecha inválido',
+            'amount.min' => 'El monto mínimo permitido es $0.01',
+            'amount.max' => 'El monto no puede superar $1,000,000',
+            'customerNumber.exists' => 'El cliente seleccionado no existe'
         ]);
-        return response()->json(['Payment' => $payment]);
+    
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $payment = Payment::create($request->all());
+        return response()->json(['Payment' => $payment], 201);
     }
 
     public function showPayments($id)
@@ -402,13 +591,27 @@ broadcast(new ProductUpdated([
 
     public function updatePayments(Request $request, $id)
     {
-        $payment = Payment::find($id)
-            ->update([
-                'paymentDate' => $request->input('paymentDate'),
-                'amount' => $request->input('amount')
-            ]);
+        $validator = Validator::make($request->all(), [
+            'checkNumber' => 'string|max:50|unique:payments,checkNumber,' . $id,
+            'paymentDate' => 'date',
+            'amount' => 'numeric|min:0.01|max:1000000',
+            'customerNumber' => 'exists:customers,id'
+        ], [
+            'checkNumber.unique' => 'Este número de cheque ya está en uso',
+            'checkNumber.max' => 'El número de cheque debe tener máximo 50 caracteres',
+            'paymentDate.date' => 'Formato de fecha incorrecto',
+            'amount.min' => 'El monto debe ser al menos $0.01',
+            'amount.max' => 'El monto máximo permitido es $1,000,000',
+            'customerNumber.exists' => 'El cliente no existe en la base de datos'
+        ]);
 
-        return response()->json(['message' => 'Payment editado exitosamente']);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $payment = Payment::findOrFail($id);
+        $payment->update($request->all());
+        return response()->json(['Payment' => $payment]);
     }
 
     public function destroyPayments($id)

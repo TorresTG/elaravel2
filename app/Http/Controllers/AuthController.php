@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    
+
 
     public function register_sanctum(Request $request)
     {
@@ -54,7 +54,7 @@ class AuthController extends Controller
                 'message' => 'No se pudo generar un código único. Intenta registrar nuevamente.'
             ], 500);
         }
-     
+
 
         $user = User::create([
             'name' => $request->name,
@@ -72,7 +72,7 @@ class AuthController extends Controller
             ->delay(now()->addMinutes(5));
 
         Mail::to($request->email)->send(new digitActivationMail($codemail));
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Procesando usuario. Por favor, revisa tu correo para activar la cuenta.'
@@ -115,10 +115,11 @@ class AuthController extends Controller
     }
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Saliendo...'], 200);
     }
+
 
     public function activateAccount(Request $request)
     {
