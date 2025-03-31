@@ -27,9 +27,8 @@ Route::get('/hello', function () {
     return 'hello';
 });
 
-Route::middleware(['log.historial'])->group(function () {
     // rutas que solo puedes acceder si eres admin }
-    Route::middleware(['auth:sanctum', 'checkadmin', 'log.historial'])->group(function () {
+    Route::middleware(['auth:sanctum', 'checkadmin'])->group(function () {
         Route::get('/v1/isAdmin', [AdminController::class, 'isAdmin']);
         Route::get('/v1/users', [AdminController::class, 'getUsers']);
         Route::post('/v1/activate', [AdminController::class, 'activateUser']);
@@ -94,7 +93,7 @@ Route::middleware(['auth:sanctum','checkrole', 'checkactive', 'checkinactive'])-
 });
 */
     //Tablas
-    Route::middleware(['auth:sanctum', 'log.historial'])->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
         //////////////////////////////////////////////////////////////////////////////
         // Mostrar todos lal librerías
         Route::get('/v1/librerías', [LibroController::class, 'indexLibrerías']);
@@ -185,8 +184,6 @@ Route::middleware(['auth:sanctum','checkrole', 'checkactive', 'checkinactive'])-
         Route::get('/v1/model-fields/{model}', [LibroController::class, 'esquema_modelo'])->middleware('checkrole');
 
     });
-
-});
 
 Route::get('/digitActivate/{code}', [AuthController::class, 'digitActivateAcount'])->name('user.digitActivate');
 Route::get('v1/sse/product_lines', [SSEController::class, 'stream']);

@@ -66,8 +66,7 @@ class Kernel extends HttpKernel
         'checkadmin' => \App\Http\Middleware\CheckAdmin::class,
         'checkactive' => \App\Http\Middleware\CheckActive::class,
         'checkinactive' => \App\Http\Middleware\CheckInActive::class,
-        'checkrole' => \App\Http\Middleware\CheckUserRole::class,
-        'log.historial' => \App\Http\Middleware\LogHistorial::class
+        'checkrole' => \App\Http\Middleware\CheckUserRole::class
         
     ];
 }
