@@ -22,7 +22,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
         ]);
 
@@ -33,43 +33,48 @@ class AuthController extends Controller
             ], 422);
         }
 
-        if (User::where('email', $request->email)->exists()) {
-            return response()->json(['message' => 'El usuario ya existe.'], 400);
-        }
-
-        $maxAttempts = 10;
+        // Generación mejorada de código único
         $codemail = null;
+        $attempts = 0;
 
-        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
-            $generatedCode = mt_rand(100000, 999999);
+        do {
+            $codemail = mt_rand(100000, 999999);
+            $attempts++;
 
-            if (!User::where('codemail', $generatedCode)->exists()) {
-                $codemail = $generatedCode;
-                break;
+            if ($attempts > 100) { // Límite más generoso
+                return response()->json([
+                    'message' => 'No se pudo generar un código único'
+                ], 500);
             }
-        }
 
-        if (!$codemail) {
+        } while (User::where('codemail', $codemail)->exists());
+
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role_id' => 1,
+                'is_active' => false,
+                'is_inactive' => true,
+                'codemail' => $codemail,
+                'profile_picture' => "https://ui-avatars.com/api/?name=" . urlencode($request->name) . "&color=7F9CF5&background=EBF4FF",
+                'activation_token' => null
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'No se pudo generar un código único. Intenta registrar nuevamente.'
+                'message' => 'Error al crear el usuario: ' . $e->getMessage()
             ], 500);
         }
 
+        // Verificación inmediata
+        $freshUser = User::find($user->id);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role_id' => 1,
-            'is_active' => false,
-            'is_inactive' => true,
-            'codemail' => $codemail,
-            'profile_picture' => "https://ui-avatars.com/api/?name=" . urlencode($request->name) . "&color=7F9CF5&background=EBF4FF",
-            'activation_token' => null
-        ]);
-
-        ExpireActivationCode::dispatch($user)
-            ->delay(now()->addMinutes(5));
+        if (!$freshUser || !$freshUser->codemail) {
+            return response()->json([
+                'message' => 'Error crítico: El código no se guardó correctamente'
+            ], 500);
+        }
 
         Mail::to($request->email)->send(new digitActivationMail($codemail));
 
@@ -165,6 +170,55 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Cuenta activada exitosamente'], 200);
     }
+
+
+    public function resendActivationCode(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Email inválido'], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        if ($user->is_active) {
+            return response()->json(['error' => 'La cuenta ya está activada'], 400);
+        }
+
+        $maxAttempts = 10;
+        $codemail = null;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            $generatedCode = mt_rand(100000, 999999);
+            if (!User::where('codemail', $generatedCode)->exists()) {
+                $codemail = $generatedCode;
+                break;
+            }
+        }
+
+        if (!$codemail) {
+            return response()->json([
+                'error' => 'No se pudo generar un código único'
+            ], 500);
+        }
+
+        $user->update(['codemail' => $codemail]);
+
+        ExpireActivationCode::dispatch($user)
+            ->delay(now()->addMinutes(5));
+
+        Mail::to($user->email)->send(new digitActivationMail($codemail));
+
+        return response()->json(['message' => 'Nuevo código enviado al correo'], 200);
+    }
+
 
     public function resendActivationLink(Request $request)
     {
