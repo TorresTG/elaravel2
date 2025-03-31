@@ -184,7 +184,8 @@ Route::middleware(['auth:sanctum','checkrole', 'checkactive', 'checkinactive'])-
         Route::get('/v1/model-fields/{model}', [LibroController::class, 'esquema_modelo'])->middleware('checkrole');
 
     });
+    
 
 Route::post('/resend-activation-code', [AuthController::class, 'resendActivationCode']);
 Route::get('/digitActivate/{code}', [AuthController::class, 'digitActivateAcount'])->name('user.digitActivate');
-Route::get('v1/sse/product_lines', [SSEController::class, 'stream']);
+Route::get('v1/sse/product_lines', [SSEController::class, 'stream']); 
