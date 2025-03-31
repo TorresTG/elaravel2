@@ -37,3 +37,4 @@ class LogHistorial extends Controller
         return $route?->getActionName() ?? null;
     }
 }
+

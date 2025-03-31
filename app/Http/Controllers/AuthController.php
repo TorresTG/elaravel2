@@ -166,6 +166,53 @@ class AuthController extends Controller
         return response()->json(['message' => 'Cuenta activada exitosamente'], 200);
     }
 
+    public function resendActivationCode(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Email inválido'], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        if ($user->is_active) {
+            return response()->json(['error' => 'La cuenta ya está activada'], 400);
+        }
+
+        $maxAttempts = 10;
+        $codemail = null;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            $generatedCode = mt_rand(100000, 999999);
+            if (!User::where('codemail', $generatedCode)->exists()) {
+                $codemail = $generatedCode;
+                break;
+            }
+        }
+
+        if (!$codemail) {
+            return response()->json([
+                'error' => 'No se pudo generar un código único'
+            ], 500);
+        }
+
+        $user->update(['codemail' => $codemail]);
+
+        ExpireActivationCode::dispatch($user)
+            ->delay(now()->addMinutes(5));
+
+        Mail::to($user->email)->send(new digitActivationMail($codemail));
+
+        return response()->json(['message' => 'Nuevo código enviado al correo'], 200);
+    }
+
     public function resendActivationLink(Request $request)
     {
         $validator = Validator::make($request->all(), [
