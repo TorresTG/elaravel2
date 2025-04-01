@@ -93,11 +93,11 @@ return [
         'mongodb' => [
             'driver' => 'mongodb',
             'dsn' => env('DB_URI'),
-            'database' => env('DB_DATABASE'),
+            'database' => env('DB_NAME', 'laravel'),
             'options' => [
-                'tlsAllowInvalidCertificates' => true, 
-                'database' => 'admin'
-            ]
+                'tlsAllowInvalidCertificates' => true, // ⚠️ Solo para pruebas
+                'ssl' => true,
+            ],
         ],
 
     ],
@@ -132,7 +132,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [

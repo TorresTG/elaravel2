@@ -115,4 +115,30 @@ class AdminController extends Controller
             'message' => 'Usuario dado de baja exitosamente.',
         ]);
     }
+
+    public function alta(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Los datos proporcionados son inválidos.',
+            ], 422);
+        }
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'El usuario no existe.'], 404);
+        }
+        if ($user->role_id == 3) {
+            return response()->json(['message' => 'El usuario es admin.'], 400);
+        }
+        $user->is_Inactive = true;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Usuario dado de baja exitosamente.',
+        ]);
+    }
 }

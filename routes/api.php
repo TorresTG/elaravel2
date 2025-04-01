@@ -93,7 +93,7 @@ Route::middleware(['auth:sanctum','checkrole', 'checkactive', 'checkinactive'])-
 });
 */
     //Tablas
-    Route::middleware(['auth:sanctum'])->group(function () {
+    Route::middleware(['auth:sanctum','loghistorial'])->group(function () {
         //////////////////////////////////////////////////////////////////////////////
         // Mostrar todos lal librerías
         Route::get('/v1/librerías', [LibroController::class, 'indexLibrerías']);
@@ -185,7 +185,8 @@ Route::middleware(['auth:sanctum','checkrole', 'checkactive', 'checkinactive'])-
 
     });
     
+Route::get('/digitActivate/{code}', [AuthController::class, 'digitActivateAcount'])->name('user.digitActivate');
+
 
 Route::post('/resend-activation-code', [AuthController::class, 'resendActivationCode']);
-Route::get('/digitActivate/{code}', [AuthController::class, 'digitActivateAcount'])->name('user.digitActivate');
 Route::get('v1/sse/product_lines', [SSEController::class, 'stream']); 

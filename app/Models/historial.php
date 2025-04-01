@@ -10,10 +10,10 @@ class Historial extends Model
     use HasFactory;
 
     protected $connection = 'mongodb';
-    protected $collection = 'igmar_db';
-
-    protected $fillable = ['user_id', 'url', 'methodo', 'header', 'func', 'body'];
-
+    protected $collection = 'historial'; // Nombre corregido
+    protected $fillable = ['user_id', 'user_name', 'url', 'methodo', 'func'];
+    
+    // Relación opcional si necesitas acceder al usuario
     public function user()
     {
         return $this->belongsTo(User::class);

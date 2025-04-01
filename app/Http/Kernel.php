@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        //\App\Http\Middleware\LogHistorial::class
     ];
 
     /**
@@ -66,7 +67,8 @@ class Kernel extends HttpKernel
         'checkadmin' => \App\Http\Middleware\CheckAdmin::class,
         'checkactive' => \App\Http\Middleware\CheckActive::class,
         'checkinactive' => \App\Http\Middleware\CheckInActive::class,
-        'checkrole' => \App\Http\Middleware\CheckUserRole::class
+        'checkrole' => \App\Http\Middleware\CheckUserRole::class,
+        'loghistorial' => \App\Http\Middleware\LogHistorial::class
         
     ];
 }
