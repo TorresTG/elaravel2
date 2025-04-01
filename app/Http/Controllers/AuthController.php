@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Mail\AccountActivationMail;
 use App\Mail\AdminNotificationMail;
 use Illuminate\Support\Facades\Validator;
+use Log;
 
 class AuthController extends Controller
 {
@@ -192,32 +193,21 @@ class AuthController extends Controller
             return response()->json(['error' => 'La cuenta ya está activada'], 400);
         }
 
-        $maxAttempts = 10;
-        $codemail = null;
+        // Genera y guarda el nuevo código
+        do {
+            $code = random_int(100000, 999999);
+        } while (User::where('codemail', $code)->exists()); // ✅ Usa User::where()
 
-        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
-            $generatedCode = mt_rand(100000, 999999);
-            if (!User::where('codemail', $generatedCode)->exists()) {
-                $codemail = $generatedCode;
-                break;
-            }
-        }
+        $user->codemail = $code;
+        $user->save();
 
-        if (!$codemail) {
-            return response()->json([
-                'error' => 'No se pudo generar un código único'
-            ], 500);
-        }
-
-        $user->update(['codemail' => $codemail]);
-
-        ExpireActivationCode::dispatch($user)
-            ->delay(now()->addMinutes(5));
-
-        Mail::to($user->email)->send(new digitActivationMail($codemail));
+        Mail::to($request->email)->send(new digitActivationMail($user->codemail));
 
         return response()->json(['message' => 'Nuevo código enviado al correo'], 200);
     }
+
+
+
 
 
     public function resendActivationLink(Request $request)
@@ -245,4 +235,6 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Se ha enviado un nuevo enlace de activación a tu correo electrónico.'], 200);
     }
+
+
 }
