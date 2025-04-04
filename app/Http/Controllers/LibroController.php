@@ -6,6 +6,7 @@ use App\Events\ProductUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Employee;
+use App\Models\Historial;
 use App\Models\Libreria;
 
 
@@ -689,6 +690,12 @@ class LibroController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Modelo no encontrado'], 404);
         }
+    }
+
+    public function historial()
+    {
+        $historial = Historial::all();
+        return response()->json(['Historial' => $historial]);
     }
 
 }
