@@ -63,6 +63,11 @@
         <h1>Activación de cuenta</h1>
         <p>¡Bienvenido! Por favor, haz clic en el enlace a continuación para activar tu cuenta:</p>
         <h2>su codigo de activacion es: {{ $codemail }}</h2>
+
+        <br>
+        <h2>introduzca el codigo en este link</h2>
+        <a href="{{ $signedRoute }}">Activar Cuenta</a>
+        <br>
         <p>Este enlace es válido por 5 minutos.</p>
         <div class="footer">
             Si no solicitaste este correo, puedes ignorarlo.

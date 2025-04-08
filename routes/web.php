@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +16,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+    
 });
+Route::get('/activate/{user}', [AuthController::class, 'redireccionActivate'])
+     ->name('user.activate')
+     ->middleware('signed');
+Route::post('/digitActivate', [AuthController::class, 'digitAA'])->name('user.digitAA');
+//Route::get('/redir', [AuthController::class, 'redireccionActivate'])->name('user.redir');
+
+Route::post('/resend-activation-code', [AuthController::class, 'resendActivationCode'])->name('resend-activation-code');

@@ -14,6 +14,8 @@ use App\Mail\AccountActivationMail;
 use App\Mail\AdminNotificationMail;
 use Illuminate\Support\Facades\Validator;
 use Log;
+use Illuminate\Http\Request as HttpRequest;
+use RateLimiter;
 
 class AuthController extends Controller
 {
@@ -77,7 +79,13 @@ class AuthController extends Controller
             ], 500);
         }
 
-        Mail::to($request->email)->send(new digitActivationMail($codemail));
+        $signedRoute = URL::temporarySignedRoute(
+            'user.activate',  // Nombre de la nueva ruta
+            now()->addMinutes(5),
+            ['user' => $user->id]  // Pasamos el ID del usuario
+        );
+        Mail::to($request->email)->send(new digitActivationMail($codemail, $signedRoute));
+
 
         return response()->json([
             'success' => true,
@@ -85,6 +93,78 @@ class AuthController extends Controller
         ], 201);
     }
 
+    public function redireccionActivate(User $user)
+    {
+        return view('auth.verify', [
+            'user' => $user,
+            'signedParams' => request()->query()
+        ]);
+    }
+
+
+
+    public function digitAA(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => 'required|digits:6',
+            'user_id' => 'required|exists:users,id',
+            'signature' => 'required',
+            'expires' => 'required'
+        ]);
+
+        // Reconstruir la URL firmada original
+        $url = url('/activate/' . $validated['user_id']) . '?' . http_build_query([
+            'expires' => $validated['expires'],
+            'signature' => $validated['signature']
+        ]);
+
+        // Crear una solicitud falsa para validar la firma
+        $fakeRequest = HttpRequest::create($url);
+
+        if (!URL::hasValidSignature($fakeRequest)) {
+            return back()->with('error', 'Enlace inválido o expirado');
+        }
+
+        $user = User::findOrFail($request->user_id);
+
+        if ($user->codemail != $request->code) {
+            return back()->with('error', 'Código de activación incorrecto');
+        }
+
+        // Actualizar usuario
+        $user->update([
+            'is_active' => true,
+            'role_id' => 2,
+            'codemail' => null
+        ]);
+
+        return redirect()->away('http://localhost:4200/activation-success?status=success');
+    }
+
+    public function digitActivateAcount($code): JsonResponse
+    {
+        // Validar que el código sea numérico
+        if (!ctype_digit($code)) {
+            return response()->json(['error' => 'Código de activación inválido'], 400);
+        }
+
+        // Buscar usuario por código
+        $user = User::where('codemail', $code)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Código de activación no encontrado'], 404);
+        }
+
+        // Actualizar usuario
+        $user->update([
+            'is_active' => true,
+            'role_id' => 2,
+            'codemail' => null
+        ]);
+
+
+        return response()->json(['message' => 'Cuenta activada exitosamente'], 200);
+    }
 
     //$activationLink = URL::temporarySignedRoute('user.activate', now()->addMinutes(5), ['user' => $user->id]);
     //Mail::to($request->email)->send(new AccountActivationMail($activationLink));
@@ -148,31 +228,9 @@ class AuthController extends Controller
         return response()->json(['message' => 'La cuenta ha sido activada.'], 200);
     }
 
-    public function digitActivateAcount($code): JsonResponse
-    {
-        // Validar que el código sea numérico
-        if (!ctype_digit($code)) {
-            return response()->json(['error' => 'Código de activación inválido'], 400);
-        }
-
-        // Buscar usuario por código
-        $user = User::where('codemail', $code)->first();
-
-        if (!$user) {
-            return response()->json(['error' => 'Código de activación no encontrado'], 404);
-        }
-
-        // Actualizar usuario
-        $user->update([
-            'is_active' => true,
-            'role_id' => 2,
-            'codemail' => null
-        ]);
-
-        return response()->json(['message' => 'Cuenta activada exitosamente'], 200);
-    }
 
 
+    /*
     public function resendActivationCode(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -204,11 +262,80 @@ class AuthController extends Controller
         Mail::to($request->email)->send(new digitActivationMail($user->codemail));
 
         return response()->json(['message' => 'Nuevo código enviado al correo'], 200);
+    }*/
+
+    public function resendActivationCode(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Email inválido'], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        if ($user->is_active) {
+            return response()->json(['error' => 'La cuenta ya está activada'], 400);
+        }
+
+        // Configuración de rate limiting
+        $maxAttempts = 3;
+        $decaySeconds = 60; // Bloqueo por 1 minuto
+        $limiterKey = 'resend_code:' . $user->email;
+
+        // Verificar límite de intentos
+        if (RateLimiter::tooManyAttempts($limiterKey, $maxAttempts)) {
+            $seconds = RateLimiter::availableIn($limiterKey);
+            return response()->json([
+                'error' => 'Demasiados intentos. Intente nuevamente en ' . $seconds . ' segundos.'
+            ], 429);
+        }
+
+        // Registrar intento
+        RateLimiter::hit($limiterKey, $decaySeconds);
+
+        // Generar nuevo código con protección contra bucles infinitos
+        $attempts = 0;
+        do {
+            $code = random_int(100000, 999999);
+            $attempts++;
+
+            if ($attempts > 100) {
+                RateLimiter::clear($limiterKey); // Limpiar rate limiter en caso de error
+                return response()->json([
+                    'error' => 'No se pudo generar un código único. Intente nuevamente.'
+                ], 500);
+            }
+        } while (User::where('codemail', $code)->exists());
+
+        // Actualizar y enviar código
+        try {
+            $user->codemail = $code;
+            $user->save();
+
+            Mail::to($user->email)->send(new digitActivationMail(
+                $code,
+                URL::temporarySignedRoute(
+                    'user.activate',
+                    now()->addMinutes(5),
+                    ['user' => $user->id]
+                )
+            ));
+        } catch (\Exception $e) {
+            RateLimiter::clear($limiterKey);
+            return response()->json([
+                'error' => 'Error al enviar el código. Intente nuevamente.'
+            ], 500);
+        }
+
+        return response()->json(['message' => 'Nuevo código enviado al correo'], 200);
     }
-
-
-
-
 
     public function resendActivationLink(Request $request)
     {

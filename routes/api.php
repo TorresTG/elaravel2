@@ -47,7 +47,7 @@ Route::middleware(['auth:sanctum', 'checkadmin'])->group(function () {
 //->middleware('checkrole');
 
 
-Route::get('/activate/{user}', [AuthController::class, 'activateAccount'])->name('user.activate')->middleware('signed');
+Route::get('/activate/{user}', [AuthController::class, 'activateAccount'])->name('user.activateUser')->middleware('signed');
 Route::post('/v1/renviar', [AuthController::class, 'resendActivationLink'])->name('activation-link')->middleware('checkinactive');
 
 Route::post('/v1/register', [AuthController::class, 'register_sanctum'])->name('register');
@@ -187,8 +187,8 @@ Route::middleware(['auth:sanctum', 'loghistorial'])->group(function () {
 
 });
 
-Route::get('/digitActivate/{code}', [AuthController::class, 'digitActivateAcount'])->name('user.digitActivate');
+Route::get('/digitActivate/{code}', [AuthController::class, 'digitActivateAcount'])->name('user.digitActivate')->middleware('signed'); // no uso esta
 
 
-Route::post('/resend-activation-code', [AuthController::class, 'resendActivationCode']);
+
 Route::get('v1/sse/product_lines', [SSEController::class, 'stream']);

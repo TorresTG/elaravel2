@@ -13,14 +13,16 @@ class digitActivationMail extends Mailable
 {
     use Queueable, SerializesModels;
     private $codemail;
+    private $signedRoute;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(int $codemail)
+    public function __construct(int $codemail, $signedRoute)
     {
+        $this->signedRoute = $signedRoute;
         $this->codemail = $codemail;
     }
 
@@ -28,7 +30,8 @@ class digitActivationMail extends Mailable
     {
         return $this->from('noreply@example.com', 'Example App') // Configura el remitente aquí
                     ->view('emails.activate_account')
-                    ->with('activationLink', $this->codemail);
+                    ->with('activationLink', $this->codemail)
+                    ->with('signedRoute', $this->signedRoute);
     }
 
     /**
@@ -53,7 +56,8 @@ class digitActivationMail extends Mailable
         return new Content(
             view: 'emails.digit_activation',
             with: [
-                'codemail' => $this->codemail
+                'codemail' => $this->codemail,
+                'signedRoute' => $this->signedRoute
             ]
         );
     }
