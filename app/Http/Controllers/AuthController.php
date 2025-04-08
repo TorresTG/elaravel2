@@ -310,7 +310,7 @@ class AuthController extends Controller
                 RateLimiter::clear($limiterKey); // Limpiar rate limiter en caso de error
                 return response()->json([
                     'error' => 'No se pudo generar un código único. Intente nuevamente.'
-                ], 500);
+                ], 500); 
             }
         } while (User::where('codemail', $code)->exists());
 
